@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { router as auth } from './routes/auth'
 
 export const router = Router()
 
@@ -6,3 +7,5 @@ export const router = Router()
 router.get('/', (req, res) => {
   res.status(200).json({ message: 'API is active.' })
 })
+
+router.use('/auth', auth)
