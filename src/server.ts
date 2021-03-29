@@ -23,7 +23,8 @@ const database: string =
 mongoose.connect(database, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useFindAndModify: false
+  useFindAndModify: false,
+  useCreateIndex: true
 })
 const db = mongoose.connection
 db.on('error', (error) => console.log(error))

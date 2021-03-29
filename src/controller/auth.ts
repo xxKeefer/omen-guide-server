@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import User from '../models/user'
+import Token from '../models/token'
 
 export const createUser = async (
   req: Request,
@@ -8,16 +10,15 @@ export const createUser = async (
 ): Promise<Response> => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    const user = <UserObj>{
+
+    const user = await User.create({
       username: req.body.username,
       password: hashedPassword,
       roles: ['user']
-    }
-    // Make this a mongo DB
-    tempDB.push(user)
-    return res.status(201).send()
+    })
+    return res.status(201).json(user)
   } catch (error) {
-    return res.status(500).json(error.message)
+    return res.status(409).json({ err: 'Username is already taken.' })
   }
 }
 
@@ -25,9 +26,7 @@ export const loginUser = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const user = <
-    UserObj // Make this a mongo DB
-  >tempDB.find((user) => (user.username = req.body.username))
+  const user = await User.findOne({ username: req.body.username })
   if (user === null) return res.status(400).json({ err: 'Cannot find user.' })
 
   try {
@@ -43,17 +42,23 @@ export const loginUser = async (
   }
 }
 
-export const logoutUser = (req: Request, res: Response): Response => {
-  //TODO: make this a database call
-  refreshTokens = refreshTokens.filter((token) => token !== req.body.token)
+export const logoutUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  await Token.deleteOne({ token: req.body.token })
   return res.sendStatus(204)
 }
 
-export const newToken = (req: Request, res: Response): void | Response => {
+export const newToken = async (
+  req: Request,
+  res: Response
+): Promise<void | Response> => {
   const refreshToken = req.body.token
   if (refreshToken == null) return res.sendStatus(401)
-  //TODO: make this a database call
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
+  const isTokenValid = await checkRefreshToken(refreshToken)
+  if (!isTokenValid) return res.sendStatus(403)
+
   jwt.verify(
     refreshToken,
     <string>process.env.REFRESH_TOKEN_SECRET,
@@ -83,36 +88,48 @@ const generateRefreshToken = (username: string): string => {
     userData,
     <string>process.env.REFRESH_TOKEN_SECRET
   )
-  //TODO: make this a database call
-  refreshTokens.push(refreshToken)
+
   return refreshToken
 }
 
-const authenticateUser = (res: Response, username: string): Response => {
-  return res.status(200).json({
-    accessToken: generateAccessToken(username),
-    refreshToken: generateRefreshToken(username)
-  })
+const checkRefreshToken = async (token: string): Promise<Boolean> => {
+  const validToken = await Token.findOne({ token })
+
+  return Boolean(validToken)
+}
+
+const authenticateUser = async (
+  res: Response,
+  username: string
+): Promise<Response> => {
+  const accessToken = generateAccessToken(username)
+  const refreshToken = generateRefreshToken(username)
+
+  try {
+    const createdToken = await Token.create({
+      token: refreshToken,
+      forUser: username
+    })
+
+    if (createdToken) {
+      return res.status(200).json({
+        accessToken,
+        refreshToken
+      })
+    } else {
+      return res.sendStatus(500)
+    }
+  } catch (error) {
+    return res.status(500).json({ error })
+  }
 }
 
 //TESTING PURPOSES
 export const getUsers = (req: Request, res: Response): Response => {
   // Make this a mongo DB
-  return res.json(tempDB)
+  return res.json(User.find({}))
 }
 
 export const sessionCheck = (req: Request, res: Response): Response => {
   return res.status(200).json({ user: req.body.user })
 }
-
-//TODO: make this a mongo Schema
-type UserObj = {
-  username: string
-  password: string
-  roles: string[]
-}
-
-//TODO: make this a mongoDB document
-const tempDB: Array<UserObj> = []
-//TODO: make this a mongoDB document
-let refreshTokens: Array<string> = []

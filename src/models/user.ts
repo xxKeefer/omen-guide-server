@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 import UserInterface from '../interface/user'
 
-const UserSchema = new Schema<UserInterface>(
+const UserSchema: Schema = new Schema(
   {
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -10,4 +10,4 @@ const UserSchema = new Schema<UserInterface>(
   { timestamps: true }
 )
 
-export default mongoose.model('User', UserSchema)
+export default mongoose.model<UserInterface>('User', UserSchema)
