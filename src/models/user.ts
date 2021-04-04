@@ -1,13 +1,29 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, {
+  Document,
+  PassportLocalModel,
+  PassportLocalSchema
+} from 'mongoose'
 import UserInterface from '../interface/user'
+import passportLocalMongoose from 'passport-local-mongoose'
 
-const UserSchema: Schema = new Schema(
+const userSchema = new mongoose.Schema(
   {
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    email: String,
+    password: String,
+    username: String,
     roles: { type: Array, required: true, default: ['user'] }
   },
   { timestamps: true }
-)
+) as PassportLocalSchema
 
-export default mongoose.model<UserInterface>('User', UserSchema)
+interface UserModel<T extends Document> extends PassportLocalModel<T> {}
+
+userSchema.plugin(passportLocalMongoose, {
+  usernameField: 'email'
+})
+
+const User: UserModel<UserInterface> = mongoose.model<UserInterface>(
+  'User',
+  userSchema
+)
+export default User
