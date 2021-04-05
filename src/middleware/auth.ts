@@ -13,25 +13,23 @@ export const authenticateUser = (
     .json({ message: 'You are not authorized to see that.' })
 }
 
-export const authenticateAdmin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { user: authenticatedUser }: any = req
-  if (!authenticatedUser)
-    res.status(403).json({ message: 'You are not authorized to see that.' })
+export const authenticateRole = (role: string) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { user: authenticatedUser }: any = req
+    if (!authenticatedUser)
+      res.status(403).json({ message: 'You are not authorized to see that.' })
 
-  try {
-    const user: UserInterface | null = await User.findOne({
-      username: authenticatedUser.username
-    })
-    if (!user?.roles.includes('admin'))
-      return res
-        .status(403)
-        .json({ message: 'You are not authorized to see that.' })
-    return next()
-  } catch (error) {
-    return res.status(500).json({ message: error.message })
+    try {
+      const user: UserInterface | null = await User.findOne({
+        username: authenticatedUser.username
+      })
+      if (!user?.roles.includes(role))
+        return res
+          .status(403)
+          .json({ message: 'You are not authorized to see that.' })
+      return next()
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import passport from 'passport'
-import { authenticateUser, authenticateAdmin } from '../../middleware/auth'
+import { authenticateUser, authenticateRole } from '../../middleware/auth'
 import {
   createUser,
   loginUser,
@@ -18,6 +18,6 @@ router.route('/login').post(passport.authenticate('local'), loginUser)
 router.route('/logout').delete(logoutUser)
 
 //testing
-router.route('/users').get(authenticateAdmin, getUsers)
+router.route('/users').get(authenticateRole('admin'), getUsers)
 
 router.route('/session').get(authenticateUser, sessionCheck)

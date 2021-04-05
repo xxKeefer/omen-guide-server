@@ -5,6 +5,7 @@ import cors from 'cors'
 import passport from 'passport'
 import cookieParser from 'cookie-parser'
 import session from 'express-session'
+import MongoStore from 'connect-mongo'
 
 dotenv //imports dotenv if in dev env
 const dbURL: string =
@@ -32,11 +33,13 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ limit: '50mb', extended: false }))
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
+const storeConfig = { mongoUrl: dbURL, ttl: 7 * 24 * 60 * 60 }
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'cookie cat',
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: MongoStore.create(storeConfig)
   })
 )
 
