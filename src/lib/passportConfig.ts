@@ -8,7 +8,7 @@ const LocalStrategy = passportLocal.Strategy
 
 passport.use(
   new LocalStrategy((username: string, password: string, done) => {
-    User.findOne({ username }, (error: any, user: DatabaseUserInterface) => {
+    User.findOne({ username }, (error: Error, user: DatabaseUserInterface) => {
       if (error) throw error
       if (!user) return done(null, false)
       bcrypt.compare(password, user.password, (error, result: boolean) => {
@@ -23,12 +23,12 @@ passport.use(
   })
 )
 
-passport.serializeUser(function (user: any, done) {
+passport.serializeUser((user: any, done) => {
   done(null, user._id)
 })
 
 passport.deserializeUser((id: string, done) => {
-  User.findOne({ _id: id }, (error: any, user: DatabaseUserInterface) => {
+  User.findOne({ _id: id }, (error: Error, user: DatabaseUserInterface) => {
     const userInformation = {
       username: user.username,
       roles: user.roles,
