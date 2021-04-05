@@ -4,8 +4,7 @@ import User from '../models/user'
 
 export const createUser = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response> => {
   const { username, password } = req?.body
   if (
@@ -34,11 +33,7 @@ export const createUser = async (
   }
 }
 
-export const loginUser = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Response => {
+export const loginUser = (req: Request, res: Response): Response => {
   return res.status(200).json({ message: 'User logged in.' })
 }
 
