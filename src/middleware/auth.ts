@@ -1,22 +1,37 @@
 import { Request, Response, NextFunction } from 'express'
-import jwt from 'jsonwebtoken'
+import UserInterface, { DatabaseUserInterface } from '../interface/user'
+import User from '../models/user'
 
-export const authenticateToken = (
+export const authenticateUser = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = <string>req.headers.authorization
-  const token = authHeader && authHeader?.split(' ')[1]
-  if (token == null) return res.sendStatus(401)
+  if (req.user) return next()
+  return res
+    .status(403)
+    .json({ message: 'You are not authorized to see that.' })
+}
 
-  jwt.verify(
-    token,
-    <string>process.env.ACCESS_TOKEN_SECRET,
-    (err: any, user: any) => {
-      if (err) return res.sendStatus(403)
-      req.body.user = user
-      next()
-    }
-  )
+export const authenticateAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user: authenticatedUser }: any = req
+  if (!authenticatedUser)
+    res.status(403).json({ message: 'You are not authorized to see that.' })
+
+  try {
+    const user: UserInterface | null = await User.findOne({
+      username: authenticatedUser.username
+    })
+    if (!user?.roles.includes('admin'))
+      return res
+        .status(403)
+        .json({ message: 'You are not authorized to see that.' })
+    return next()
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
 }

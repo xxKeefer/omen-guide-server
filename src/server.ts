@@ -1,31 +1,23 @@
 import dotenv from './lib/env'
-import express, { Application } from 'express'
-import cors from 'cors'
 import mongoose from 'mongoose'
-import jwt from 'jsonwebtoken'
-import { router as apiRoutes } from './api/apiRoutes'
+import express from 'express'
+import cors from 'cors'
+import passport from 'passport'
+import cookieParser from 'cookie-parser'
+import session from 'express-session'
 
-// EXPRESS CONFIG
 dotenv //imports dotenv if in dev env
-const app: Application = express()
-const port: string = process.env.PORT || '5000'
-
-app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({ limit: '50mb', extended: false }))
-
-//DATABASE
-const database: string =
+const dbURL: string =
   process.env.NODE_ENV === 'test'
     ? <string>process.env.DB_URL_TEST
     : <string>process.env.DB_URL
 
-mongoose.connect(database, {
+mongoose.connect(dbURL, {
+  useCreateIndex: true,
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true
+  useUnifiedTopology: true
 })
+
 const db = mongoose.connection
 db.on('error', (error) => console.log(error))
 db.once('open', () => {
@@ -33,7 +25,28 @@ db.once('open', () => {
     console.log('DB :: connected successfully.')
 })
 
+// Middleware
+const app = express()
+const port: string = process.env.PORT || '8080'
+app.use(cookieParser())
+app.use(express.json())
+app.use(express.urlencoded({ limit: '50mb', extended: false }))
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'cookie cat',
+    resave: true,
+    saveUninitialized: true
+  })
+)
+
+// Passport
+app.use(passport.initialize())
+app.use(passport.session())
+import './lib/passportConfig'
+
 //API ROUTES
+import { router as apiRoutes } from './api/apiRoutes'
 app.use('/api', apiRoutes)
 
 // SERVER CONFIG
