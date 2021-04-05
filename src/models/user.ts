@@ -8,9 +8,8 @@ import passportLocalMongoose from 'passport-local-mongoose'
 
 const userSchema = new mongoose.Schema(
   {
-    email: String,
+    username: { type: String, unique: true },
     password: String,
-    username: String,
     roles: { type: Array, required: true, default: ['user'] }
   },
   { timestamps: true }
