@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import User from '../models/user'
 
@@ -33,7 +33,7 @@ export const createUser = async (
   }
 }
 
-export const loginUser = (req: Request, res: Response): Response => {
+export const loginUser = (res: Response): Response => {
   return res.status(200).json({ message: 'User logged in.' })
 }
 
@@ -43,10 +43,7 @@ export const logoutUser = (req: Request, res: Response) => {
 }
 
 //TESTING PURPOSES
-export const getUsers = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const getUsers = async (res: Response): Promise<Response> => {
   return res.json(await User.find({}))
 }
 
