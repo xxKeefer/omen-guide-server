@@ -1,15 +1,12 @@
 import { Document } from 'mongoose'
 
-export default interface SectionInterface extends Document {
+export interface SectionInterface {
   title: string
-  desc: string
-  link: string
+  desc?: string
   //articles: <ArticleInterface>[]
 }
-export interface DatabaseSectionInterface extends SectionInterface {
+
+export default interface SectionDocument extends SectionInterface, Document {
   title: string
-  desc: string
-  link: string
-  //articles: <ArticleInterface>[]
-  _id: string
+  desc?: string
 }

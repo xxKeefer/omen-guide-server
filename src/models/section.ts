@@ -1,24 +1,17 @@
-import mongoose, { Document } from 'mongoose'
-import SectionInterface from '../interface/section'
+import { model, Schema } from 'mongoose'
+import SectionDocument from '../interface/section'
 
-const sectionSchema = new mongoose.Schema(
+const SectionSchema = new Schema<SectionDocument>(
   {
-    title: { type: String, unique: true },
+    title: { type: String, unique: true, required: true },
     desc: {
       type: String,
-      default: function (this: SectionInterface) {
+      default: function (this: SectionDocument) {
         return `This section is about ${this.title}`
       }
-    },
-    link: String
+    }
   },
   { timestamps: true }
 )
 
-interface SectionModel<T extends Document> {}
-
-const Section: SectionModel<SectionInterface> = mongoose.model(
-  'Section',
-  sectionSchema
-)
-export default Section
+export default model<SectionDocument>('Section', SectionSchema)

@@ -29,7 +29,7 @@ export const createUser = async (
       .status(201)
       .json({ _id: newUser._id, username: newUser.username })
   } catch (error) {
-    return res.status(201).json({ message: error.message })
+    return res.status(500).json({ message: error.message })
   }
 }
 
