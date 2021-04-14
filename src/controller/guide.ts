@@ -54,11 +54,10 @@ export const updateSection = async (
 ): Promise<Response> => {
   if (!req?.body) return res.status(400).json({ error: 'Bad Request.' })
   const { title, desc } = req!.body
-  const description = !desc ? null : desc
   try {
     const sectionUpdate = await Section.findOneAndUpdate(
       { title },
-      { title, desc: description },
+      { title, desc: desc ?? null },
       { new: true }
     )
     if (!sectionUpdate)
