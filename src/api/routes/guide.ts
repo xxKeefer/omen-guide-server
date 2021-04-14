@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { authenticateUser, authenticateRole } from '../../middleware/auth'
+import { router as articles } from './article'
 import {
   createSection,
   readSection,
@@ -16,3 +17,6 @@ router.route('/read').get(readSection)
 router.route('/all').get(allSections)
 router.route('/update').put(authenticateRole('admin'), updateSection)
 router.route('/delete').delete(authenticateRole('admin'), deleteSection)
+
+// NESTED ARTICLES
+router.use('/s', articles)
