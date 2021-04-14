@@ -16,7 +16,8 @@ const ArticleSchema = new Schema<ArticleDocument>(
   { timestamps: true }
 )
 
-ArticleSchema.post('updateOne', async (article) => {
+// ithink this actually should be save not update one
+ArticleSchema.post('save', async (article) => {
   const articleLinked = await Section.findByIdAndUpdate(article.section, {
     $push: { articles: article._id }
   })
