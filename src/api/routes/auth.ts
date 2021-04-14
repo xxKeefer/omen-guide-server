@@ -14,6 +14,7 @@ export const router = Router()
 router.route('/signup').post(createUser)
 
 router.route('/login').post(passport.authenticate('local'), loginUser)
+// router.route('/login').post(loginUser)
 
 router.route('/logout').delete(logoutUser)
 

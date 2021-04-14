@@ -48,6 +48,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 import './lib/passportConfig'
 
+// Initialise Super User
+import initialiseSuperUser from './lib/initialiseSuperUser'
+initialiseSuperUser()
+
 //API ROUTES
 import { router as apiRoutes } from './api/apiRoutes'
 app.use('/api', apiRoutes)
