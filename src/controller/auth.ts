@@ -39,7 +39,7 @@ export const loginUser = (res: Response): Response => {
 
 export const logoutUser = (req: Request, res: Response) => {
   req.logout()
-  res.status(204).json({ message: 'Session destroyed.' })
+  return res.status(204).json({ message: 'Session destroyed.' })
 }
 
 //TESTING PURPOSES
