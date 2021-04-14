@@ -36,7 +36,10 @@ export const readSection = async (
   }
 }
 
-export const allSections = async (res: Response): Promise<Response> => {
+export const allSections = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const sections = await Section.find({})
     return res.status(200).json({ sections })
@@ -58,7 +61,8 @@ export const updateSection = async (
       { title, desc: description },
       { new: true }
     )
-    //TODO:validation????
+    if (!sectionUpdate)
+      return res.status(404).json({ message: 'Section not found.' })
     return res.status(200).json({ sectionUpdate })
   } catch (error) {
     return res.status(500).json({ error: error.message })
@@ -72,11 +76,9 @@ export const deleteSection = async (
   if (!req?.body) return res.status(400).json({ error: 'Bad Request.' })
   const { title } = req!.body
   try {
-    const sectionDeleted = await Section.findOneAndDelete(
-      { title },
-      { new: true }
-    )
-    //TODO:validation??????
+    const sectionDeleted = await Section.findOneAndDelete({ title })
+    if (!sectionDeleted)
+      return res.status(404).json({ message: 'Section not found.' })
     return res.status(200).json({ sectionDeleted })
   } catch (error) {
     return res.status(500).json({ error: error.message })
