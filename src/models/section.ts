@@ -9,7 +9,14 @@ const SectionSchema = new Schema<SectionDocument>(
       default: function (this: SectionDocument) {
         return `This section is about ${this.title}`
       }
-    }
+    },
+    articles: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Article',
+        required: false
+      }
+    ]
   },
   { timestamps: true }
 )
