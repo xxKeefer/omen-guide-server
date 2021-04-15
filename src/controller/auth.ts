@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import User from '../models/user'
+import { UserDataInterface, AuthenticationData } from '../interface/user'
 
 export const createUser = async (
   req: Request,
@@ -34,7 +35,13 @@ export const createUser = async (
 }
 
 export const loginUser = (req: Request, res: Response): Response => {
-  return res.status(200).json({ message: 'User logged in.' })
+  const user = <UserDataInterface>req.user
+  const userData: AuthenticationData = {
+    username: user.username,
+    roles: user.roles
+  }
+
+  return res.status(200).json(userData)
 }
 
 export const logoutUser = (req: Request, res: Response) => {
