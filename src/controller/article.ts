@@ -8,7 +8,7 @@ export const createArticle = async (
 ): Promise<Response> => {
   if (!req?.body || !req?.params)
     return res.status(400).json({ error: 'Bad Request.' })
-  const { title, desc } = req!.body
+  const { title, desc, contents } = req!.body
   const param = req!.params.section
   console.log({ param }, req.params)
 
@@ -23,6 +23,7 @@ export const createArticle = async (
     const newArticle = await Article.create({
       title,
       desc,
+      contents,
       section: section._id
     })
     return res
