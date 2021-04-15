@@ -35,13 +35,9 @@ export const createUser = async (
 }
 
 export const loginUser = (req: Request, res: Response): Response => {
-  const user = <UserDataInterface>req.user
-  const userData: AuthenticationData = {
-    username: user.username,
-    roles: user.roles
-  }
+  const { username, roles }: AuthenticationData = <UserDataInterface>req.user
 
-  return res.status(200).json(userData)
+  return res.status(200).json({ username, roles })
 }
 
 export const logoutUser = (req: Request, res: Response) => {
